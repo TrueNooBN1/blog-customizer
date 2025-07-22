@@ -28,6 +28,7 @@ export const ArticleParamsForm = ({
 	setTheme,
 }: ArticleParamsFormProps) => {
 	const [openState, setOpenState] = useState(false);
+
 	const sideBarRef = useRef<HTMLDivElement | null>(null);
 	const openButtonRef = useRef<HTMLDivElement | null>(null);
 
