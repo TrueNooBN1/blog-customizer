@@ -7,7 +7,7 @@ import { Text } from 'src/ui/text';
 import clsx from 'clsx';
 
 import styles from './ArticleParamsForm.module.scss';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import {
 	fontFamilyOptions,
 	fontSizeOptions,
@@ -17,6 +17,7 @@ import {
 	defaultArticleState,
 	ArticleStateType,
 } from 'src/constants/articleProps';
+import { useClose } from 'src/hooks/useClose';
 
 type ArticleParamsFormProps = {
 	initialTheme: ArticleStateType;
@@ -30,7 +31,6 @@ export const ArticleParamsForm = ({
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 
 	const sideBarRef = useRef<HTMLDivElement | null>(null);
-	const openButtonRef = useRef<HTMLDivElement | null>(null);
 
 	const [fontFamilyOptionsState, setFontFamilyOptionsState] = useState(
 		defaultArticleState.fontFamilyOption
@@ -69,35 +69,24 @@ export const ArticleParamsForm = ({
 		setContentWidthArrStateState(defaultArticleState.contentWidth);
 	}
 
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (!isMenuOpen) return;
-			if (
-				sideBarRef &&
-				openButtonRef &&
-				!sideBarRef.current?.contains(event.target as Node) &&
-				!openButtonRef.current?.contains(event.target as Node)
-			) {
-				setIsMenuOpen(false);
-			}
-		};
+	function closeMenu(): void {
+		setIsMenuOpen(false);
+	}
 
-		document.addEventListener('click', handleClickOutside);
-		return () => {
-			document.removeEventListener('click', handleClickOutside);
-		};
-	}, [isMenuOpen]);
+	useClose({
+		isOpen: isMenuOpen,
+		onClose: closeMenu,
+		rootRef: sideBarRef,
+	});
 
 	return (
 		<>
-			<div ref={openButtonRef}>
-				<ArrowButton
-					isOpen={isMenuOpen}
-					onClick={() => {
-						setIsMenuOpen(!isMenuOpen);
-					}}
-				/>
-			</div>
+			<ArrowButton
+				isOpen={isMenuOpen}
+				onClick={() => {
+					setIsMenuOpen(!isMenuOpen);
+				}}
+			/>
 			<aside
 				className={clsx(styles.container, {
 					[styles.container_open]: isMenuOpen,
