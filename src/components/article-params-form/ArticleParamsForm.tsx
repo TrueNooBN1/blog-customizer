@@ -27,7 +27,7 @@ export const ArticleParamsForm = ({
 	initialTheme,
 	setTheme,
 }: ArticleParamsFormProps) => {
-	const [openState, setOpenState] = useState(false);
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
 
 	const sideBarRef = useRef<HTMLDivElement | null>(null);
 	const openButtonRef = useRef<HTMLDivElement | null>(null);
@@ -71,14 +71,14 @@ export const ArticleParamsForm = ({
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
+			if (!isMenuOpen) return;
 			if (
-				openState &&
 				sideBarRef &&
 				openButtonRef &&
 				!sideBarRef.current?.contains(event.target as Node) &&
 				!openButtonRef.current?.contains(event.target as Node)
 			) {
-				setOpenState(false);
+				setIsMenuOpen(false);
 			}
 		};
 
@@ -86,24 +86,29 @@ export const ArticleParamsForm = ({
 		return () => {
 			document.removeEventListener('click', handleClickOutside);
 		};
-	});
+	}, [isMenuOpen]);
 
 	return (
 		<>
 			<div ref={openButtonRef}>
 				<ArrowButton
-					isOpen={openState}
+					isOpen={isMenuOpen}
 					onClick={() => {
-						setOpenState(!openState);
+						setIsMenuOpen(!isMenuOpen);
 					}}
 				/>
 			</div>
 			<aside
 				className={clsx(styles.container, {
-					[styles.container_open]: openState,
+					[styles.container_open]: isMenuOpen,
 				})}
 				ref={sideBarRef}>
-				<form className={styles.form} onSubmit={updateGlobalStates}>
+				<form
+					className={styles.form}
+					onSubmit={updateGlobalStates}
+					onClick={(event) => {
+						event.stopPropagation();
+					}}>
 					<Text size={31} weight={800} uppercase>
 						Задайте параметры
 					</Text>
